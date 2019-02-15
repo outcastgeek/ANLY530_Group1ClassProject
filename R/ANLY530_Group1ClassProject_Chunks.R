@@ -114,6 +114,21 @@ twentyeight.reasons <- c(
   "dental consultation"
 )
 four.seasons <- c("Summer", "Autumn", "Winter", "Spring")
+twelve.months.and.none <- c(
+  "None",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+)
 
 ## @knitr loadSheets
 
@@ -125,6 +140,7 @@ Absenteeism_data <- Absenteeism_at_work_file %>%
   fullFilePath %>%
   read.csv(encoding = "UTF-8", header=TRUE, stringsAsFactors=FALSE, sep = ";") %>%
   mutate(
+    Month.of.absence = factor(Month.of.absence, labels = twelve.months.and.none),
     Reason.for.absence = factor(Reason.for.absence, labels = twentyeight.reasons),
     Seasons = factor(Seasons, labels = four.seasons)
   )
@@ -134,6 +150,22 @@ Absenteeism_data <- Absenteeism_at_work_file %>%
 Absenteeism_data %>% colnames()
 
 Absenteeism_data %>% summary()
+
+Absenteeism_data_by_Reason <- Absenteeism_data %>%
+  group_by(ID, Reason.for.absence) %>%
+  mutate(AbsenteeismReasonHours = n()) %>%
+  filter(row_number()==1)
+
+# Absenteeism Hours by Reason
+ggplot(Absenteeism_data_by_Reason, aes(x = Reason.for.absence, y = AbsenteeismReasonHours)) +
+  geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  coord_flip() +
+  xlab("Reason for Absence") +
+  expand_limits(y=c(0.0, 50.0)) +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 6, angle = 10, hjust = 1)) +
+  ylab("Absenteeism time in hours") +
+  ggtitle("Absenteeism Hours by Reason")
 
 Absenteeism_data_by_Seasons <- Absenteeism_data %>%
   group_by(ID, Seasons) %>%
@@ -150,3 +182,35 @@ ggplot(Absenteeism_data_by_Seasons, aes(x = Reason.for.absence, y = AbsenteeismS
   ylab("Absenteeism time in hours") +
   labs("Seasons") +
   ggtitle("Absenteeism Hours by Reason per Season")
+
+# Absenteeism Hours by Season
+ggplot(Absenteeism_data_by_Seasons, aes(x = Seasons, y = AbsenteeismSeasonHours)) +
+  geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  xlab("Seasons") +
+  theme_bw() +
+  ylab("Absenteeism time in hours") +
+  ggtitle("Absenteeism Hours by Seasons")
+
+Absenteeism_data_by_Month <- Absenteeism_data %>%
+  group_by(ID, Month.of.absence) %>%
+  mutate(AbsenteeismMonthHours = n()) %>%
+  filter(row_number()==1)
+
+# Absenteeism Hours by Reason per Month
+ggplot(Absenteeism_data_by_Month, aes(x = Reason.for.absence, y = AbsenteeismMonthHours, fill = Month.of.absence)) +
+  geom_bar(stat="identity") +
+  xlab("Reason for absence") +
+  expand_limits(y=c(0.0, 50.0)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 6, angle = 65, hjust = 1)) +
+  ylab("Absenteeism time in hours") +
+  labs("Month") +
+  ggtitle("Absenteeism Hours by Reason per Month")
+
+# Absenteeism Hours by Month
+ggplot(Absenteeism_data_by_Month, aes(x = Month.of.absence, y = AbsenteeismMonthHours)) +
+  geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4) +
+  xlab("Month of Absence") +
+  theme_bw() +
+  ylab("Absenteeism time in hours") +
+  ggtitle("Absenteeism Hours by Month")
