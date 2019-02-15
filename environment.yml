@@ -21,13 +21,14 @@ dependencies:
   - r-rpart
   - r-rpart.plot
   - r-RColorBrewer
-  - r-rattle
+  #- r-rattle
   - r-NbClust
   - r-ModelMetrics
   - r-generics
   - r-gower
   - r-caret
-  - r-naivebayes
+  #- r-naivebayes
+  - r-e1071
   - rpy2
   - pip:
     - jupyterlab_latex
