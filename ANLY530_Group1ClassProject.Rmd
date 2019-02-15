@@ -34,22 +34,25 @@ Some helper functions do exists to support the code snippets below such as: ```f
 
 ---
 
-```{r loadLibraries, message=FALSE, warning=FALSE}
+```{r loadLibraries, echo=FALSE, message=FALSE, warning=FALSE}
 ```
 
 ## Collecting the data
 
-Let us start by [Loading the Data Sheets]
+Let us start by [Preping] and [Loading the Data Sheets]
 
-```{r loadSheets, message=FALSE, warning=FALSE}
+```{r prepData, echo=FALSE, message=FALSE, warning=FALSE}
+```
+
+```{r loadSheets, echo=FALSE, message=FALSE, warning=FALSE}
 ```
 
 # Initial Work
 -------------
 
-## Crunching Numbers:
+## Data Exploration:
 
-```{r crunchingNumbers, warning=FALSE}
+```{r dataExploration, warning=FALSE}
 ```
 
 ## Analysis
@@ -71,6 +74,11 @@ Words of Wisdom
 ### Helper Functions
 
 ```{r helperFunctions, eval=FALSE}
+```
+
+### Preping
+
+```{r prepData, eval=FALSE}
 ```
 
 ### Loading the Data Sheets

@@ -21,6 +21,7 @@ install.packages("naivebayes")
 
 library(dplyr)
 library(ggplot2)
+library(ggthemes)
 library(cluster)
 library(rpart)
 library(rpart.plot) 
@@ -80,6 +81,40 @@ wssplot <- function(data, nc=15, seed=1234){
   plot(1:nc, wss, type="b", xlab="Number of Clusters", 
        ylab="Within groups sum of squares")}
 
+## @knitr prepData
+
+twentyeight.reasons <- c(
+  "I Certain infectious and parasitic diseases",
+  "II Neoplasms",
+  "III Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism",
+  "IV Endocrine, nutritional and metabolic diseases",
+  "V Mental and behavioural disorders",
+  "VI Diseases of the nervous system",
+  "VII Diseases of the eye and adnexa",
+  "VIII Diseases of the ear and mastoid process",
+  "IX Diseases of the circulatory system",
+  "X Diseases of the respiratory system",
+  "XI Diseases of the digestive system",
+  "XII Diseases of the skin and subcutaneous tissue",
+  "XIII Diseases of the musculoskeletal system and connective tissue",
+  "XIV Diseases of the genitourinary system",
+  "XV Pregnancy, childbirth and the puerperium",
+  "XVI Certain conditions originating in the perinatal period",
+  "XVII Congenital malformations, deformations and chromosomal abnormalities",
+  "XVIII Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified",
+  "XIX Injury, poisoning and certain other consequences of external causes",
+  "XX External causes of morbidity and mortality",
+  "XXI Factors influencing health status and contact with health services.",
+  "patient follow-up",
+  "medical consultation",
+  " blood donation",
+  "laboratory examination",
+  "unjustified absence",
+  "physiotherapy",
+  "dental consultation"
+)
+four.seasons <- c("Summer", "Autumn", "Winter", "Spring")
+
 ## @knitr loadSheets
 
 #Set Data File Name:
@@ -88,10 +123,30 @@ Absenteeism_at_work_file <- "Absenteeism_at_work.csv"
 # Absenteeism
 Absenteeism_data <- Absenteeism_at_work_file %>%
   fullFilePath %>%
-  read.csv(encoding = "UTF-8", header=TRUE, stringsAsFactors=FALSE, sep = ";")
+  read.csv(encoding = "UTF-8", header=TRUE, stringsAsFactors=FALSE, sep = ";") %>%
+  mutate(
+    Reason.for.absence = factor(Reason.for.absence, labels = twentyeight.reasons),
+    Seasons = factor(Seasons, labels = four.seasons)
+  )
 
-## @knitr crunchingNumbers
+## @knitr dataExploration
 
 Absenteeism_data %>% colnames()
 
 Absenteeism_data %>% summary()
+
+Absenteeism_data_by_Seasons <- Absenteeism_data %>%
+  group_by(ID, Seasons) %>%
+  mutate(AbsenteeismSeasonHours = n()) %>%
+  filter(row_number()==1)
+
+# Absenteeism Hours by Reason per Season
+ggplot(Absenteeism_data_by_Seasons, aes(x = Reason.for.absence, y = AbsenteeismSeasonHours, fill = Seasons)) +
+  geom_bar(stat="identity") +
+  xlab("Reason for absence") +
+  expand_limits(y=c(0.0, 50.0)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 6, angle = 65, hjust = 1)) +
+  ylab("Absenteeism time in hours") +
+  labs("Seasons") +
+  ggtitle("Absenteeism Hours by Reason per Season")
