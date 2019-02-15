@@ -10,6 +10,12 @@ install.packages("rpart.plot")
 install.packages("RColorBrewer") 
 install.packages("rattle")
 install.packages("NbClust")
+install.packages("ModelMetrics")
+install.packages("generics")
+install.packages("gower")
+install.packages("bindrcpp")
+install.packages("caret", dependencies = c("Depends", "Suggests"))
+install.packages("naivebayes")
 
 ## @knitr loadLibraries
 
@@ -21,6 +27,12 @@ library(rpart.plot)
 library(RColorBrewer) 
 library(rattle)
 library(NbClust)
+library(ModelMetrics)
+library(generics)
+library(gower)
+library(bindrcpp)
+library(caret)
+library(naivebayes)
 
 ## @knitr helperFunctions
 
@@ -76,8 +88,10 @@ Absenteeism_at_work_file <- "Absenteeism_at_work.csv"
 # Absenteeism
 Absenteeism_data <- Absenteeism_at_work_file %>%
   fullFilePath %>%
-  read.csv(encoding = "UTF-8", header=TRUE, stringsAsFactors=FALSE)
+  read.csv(encoding = "UTF-8", header=TRUE, stringsAsFactors=FALSE, sep = ";")
 
 ## @knitr crunchingNumbers
 
-# Crunch some numbers....
+Absenteeism_data %>% colnames()
+
+Absenteeism_data %>% summary()

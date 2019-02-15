@@ -1,5 +1,5 @@
 ---
-title: "ANLY 530 Group Assignment (Laboratory 3: Mixed Methods or Semi-Supervised Learning)"
+title: "ANLY 530 Group1 Class Project: Absenteeism at Work"
 author:
 - "Josseline Betio"
 - "Akpany Benjamin Ebby"
@@ -49,7 +49,7 @@ Let us start by [Loading the Data Sheets]
 
 ## Crunching Numbers:
 
-```{r crunchingNumbers, message=FALSE, warning=FALSE}
+```{r crunchingNumbers, warning=FALSE}
 ```
 
 ## Analysis
