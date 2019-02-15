@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Activate ANLY520 Conda Environment
+source activate ANLY520
+
+# run matplotlib once to generate the font cache
+python -c "import matplotlib as mpl; mpl.use('Agg'); import pylab as plt; fig, ax = plt.subplots(); fig.savefig('test.png')"
+
+test -e test.png && rm test.png
+
+# Cache English Stopwords
+python -c "import nltk; nltk.download('stopwords')"
+
+jupyter labextension install @jupyterlab/latex
+jupyter labextension install @pyviz/jupyterlab_pyviz
+jupyter lab build

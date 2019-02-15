@@ -1,0 +1,33 @@
+name: ANLY530
+channels:
+  - conda-forge
+  - pyviz/label/dev
+  - r
+  - javascript
+dependencies:
+  - nodejs
+  - jupyterlab
+  - libgfortran
+  - simplegeneric
+  - pandas
+  - pyviz
+  - r
+  - r-base #mro-base
+  - r-essentials
+  - r-irkernel
+  - r-tidyverse
+  - r-reticulate
+  - r-cluster
+  - r-rpart
+  - r-rpart.plot
+  - r-RColorBrewer
+  - r-rattle
+  - r-NbClust
+  - r-ModelMetrics
+  - r-generics
+  - r-gower
+  - r-caret
+  - r-naivebayes
+  - rpy2
+  - pip:
+    - jupyterlab_latex

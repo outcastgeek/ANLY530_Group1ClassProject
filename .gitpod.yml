@@ -1,0 +1,9 @@
+
+ports:
+  - port: 8888
+    onOpen: open-browser
+image:
+  file: Dockerfile
+tasks:
+  - command: >
+        source activate ANLY530; jupyter lab --no-browser --ip=0.0.0.0 --port=8888
