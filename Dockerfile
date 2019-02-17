@@ -9,13 +9,13 @@ RUN apt-get update \
                           texlive-fonts-recommended \
                           texlive-xetex \
                           dvipng \
-                          ghostscript \
-                          wget \
-                          gdebi-core \
+                          ghostscript #\
+                          # wget \
+                          # gdebi-core \
     && apt-get clean && rm -rf /var/cache/apt/* && rm -rf /var/lib/apt/lists/*
 
-RUN cd /tmp && wget https://download2.rstudio.org/rstudio-server-1.1.463-amd64.deb
-RUN gdebi /tmp/rstudio-server-1.1.463-amd64.deb
+#RUN cd /tmp && wget https://download2.rstudio.org/rstudio-server-1.1.463-amd64.deb
+#RUN gdebi /tmp/rstudio-server-1.1.463-amd64.deb
 
 ADD environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml
@@ -26,5 +26,10 @@ RUN conda update --all -y
 ADD postBuild /tmp/postBuild
 RUN /tmp/postBuild
 
+# Install R libraries
+ADD install.R /tmp/install.R
+RUN Rscript /tmp/install.R
+
 # Cleanup
 RUN rm -rf /tmp/*
+
