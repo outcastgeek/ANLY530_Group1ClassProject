@@ -25,7 +25,7 @@ source('R/ANLY530_Group1ClassProject_Helper.R')
 ```{r echo=FALSE}
 
 library(knitr)
-library(kableExtra)
+#library(kableExtra)
 read_chunk('R/ANLY530_Group1ClassProject_Chunks.R')
 
 ```
@@ -39,7 +39,7 @@ Some helper functions do exists to support the code snippets below such as: ```f
 
 ## Collecting the data
 
-Let us start by [Preping] and [Loading the Data Sheets]
+Let us start by [Prepping] and [Loading the Data Sheets]
 
 ```{r prepData, echo=FALSE, message=FALSE, warning=FALSE}
 ```
@@ -76,7 +76,7 @@ Words of Wisdom
 ```{r helperFunctions, eval=FALSE}
 ```
 
-### Preping
+### Prepping
 
 ```{r prepData, eval=FALSE}
 ```
