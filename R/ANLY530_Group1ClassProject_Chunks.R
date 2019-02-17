@@ -4,6 +4,7 @@ install.packages("knitr")
 #install.packages("kableExtra")
 install.packages("dplyr")
 install.packages("ggplot2")
+install.packages("ggfortify")
 install.packages("cluster")
 install.packages("rpart")
 install.packages("rpart.plot") 
@@ -22,6 +23,7 @@ install.packages("naivebayes")
 library(dplyr)
 library(ggplot2)
 library(ggthemes)
+library(ggfortify)
 library(cluster)
 library(rpart)
 library(rpart.plot) 
@@ -214,3 +216,30 @@ ggplot(Absenteeism_data_by_Month, aes(x = Month.of.absence, y = AbsenteeismMonth
   theme_bw() +
   ylab("Absenteeism time in hours") +
   ggtitle("Absenteeism Hours by Month")
+
+## @knitr dataAnalysis
+
+# Obtain the column IDs
+columnIDs <- which(!names(Absenteeism_data)%in%c())
+
+# Convert all the dataframe to numeric
+Absenteeism_data_numeric <- Absenteeism_data %>%
+  mutate_each(funs(as.numeric), columnIDs)
+
+sapply(Absenteeism_data_numeric, class) # Check that all columns were converted to numeric
+
+# Obtain the best number of Clusters
+NbClust(Absenteeism_data_numeric, method = "kmeans")
+
+# The best number of Cluster nc according to the majority rule
+K = 2
+
+# Set Seed
+set.seed(987654321)
+
+# Perform kmeans clustering
+abs_km.out <- kmeans(Absenteeism_data_numeric, K)
+
+# Plot K-means Clusters
+autoplot(abs_km.out, data = Absenteeism_data_numeric, frame = TRUE, frame.type = 'norm', label = TRUE, label.size = K)
+

@@ -55,6 +55,11 @@ Let us start by [Prepping] and [Loading the Data Sheets]
 ```{r dataExploration, warning=FALSE}
 ```
 
+## Data Analysis:
+
+```{r dataAnalysis, warning=FALSE}
+```
+
 ## Analysis
 
 Words of Wisdom
