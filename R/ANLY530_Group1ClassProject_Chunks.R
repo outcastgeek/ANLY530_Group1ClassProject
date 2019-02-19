@@ -287,17 +287,18 @@ abs_testdata %>% dim()
 
 # Train an SVM classifier
 abs_svm_classifier <- ksvm(Absence.levels ~ ., data = abs_traindata, kernel = "vanilladot")
+
 abs_svm_classifier
 
-# Training error is around 13%.
+# plot the locations of the support vectors
+abs_svm_plot_data <- (Absenteeism_data  %>% select(-`Row#`))[alphaindex(abs_svm_classifier)[[1]],]
+kernlab::plot(abs_svm_plot_data, pch=19, main="Support vectors - linear model")
 
 # Evaluate the model
 abs_svm_predictions <- predict(abs_svm_classifier, abs_testdata)
 table(abs_svm_predictions, abs_testdata$Absence.levels)
 abs_agreement <- abs_svm_predictions == abs_testdata$Absence.levels
 table(abs_agreement)
-
-# The classifier is correct in 116 out of 148 test data points.
 
 ## @knitr naiveBayesClassification
 
