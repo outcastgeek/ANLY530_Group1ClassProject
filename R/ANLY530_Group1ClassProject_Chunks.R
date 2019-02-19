@@ -24,6 +24,8 @@ library(dplyr)
 library(ggplot2)
 library(ggthemes)
 library(ggfortify)
+library(base)
+library(kernlab)
 library(cluster)
 library(rpart)
 library(rpart.plot) 
@@ -144,7 +146,13 @@ Absenteeism_data <- Absenteeism_at_work_file %>%
   mutate(
     Month.of.absence = factor(Month.of.absence, labels = twelve.months.and.none),
     Reason.for.absence = factor(Reason.for.absence, labels = twentyeight.reasons),
-    Seasons = factor(Seasons, labels = four.seasons)
+    Seasons = factor(Seasons, labels = four.seasons),
+    Absence.levels = cut(
+      Absenteeism.time.in.hours,
+      breaks = c(0,1,2,3,4,8,9, max(Absenteeism.time.in.hours) + 1),
+      labels = c("Group 0", "Group 1", "Group 2", "Group 3", "Group 4", "Group 5", "Group 6"),
+      right = FALSE
+    )
   )
 
 ## @knitr dataExploration
@@ -155,7 +163,7 @@ Absenteeism_data %>% summary()
 
 Absenteeism_data_by_Reason <- Absenteeism_data %>%
   group_by(ID, Reason.for.absence) %>%
-  mutate(AbsenteeismReasonHours = n()) %>%
+  mutate(AbsenteeismReasonHours = sum(Absenteeism.time.in.hours)) %>%
   filter(row_number()==1)
 
 # Absenteeism Hours by Reason
@@ -171,7 +179,7 @@ ggplot(Absenteeism_data_by_Reason, aes(x = Reason.for.absence, y = AbsenteeismRe
 
 Absenteeism_data_by_Seasons <- Absenteeism_data %>%
   group_by(ID, Seasons) %>%
-  mutate(AbsenteeismSeasonHours = n()) %>%
+  mutate(AbsenteeismSeasonHours = sum(Absenteeism.time.in.hours)) %>%
   filter(row_number()==1)
 
 # Absenteeism Hours by Reason per Season
@@ -195,7 +203,7 @@ ggplot(Absenteeism_data_by_Seasons, aes(x = Seasons, y = AbsenteeismSeasonHours)
 
 Absenteeism_data_by_Month <- Absenteeism_data %>%
   group_by(ID, Month.of.absence) %>%
-  mutate(AbsenteeismMonthHours = n()) %>%
+  mutate(AbsenteeismMonthHours = sum(Absenteeism.time.in.hours)) %>%
   filter(row_number()==1)
 
 # Absenteeism Hours by Reason per Month
@@ -214,8 +222,25 @@ ggplot(Absenteeism_data_by_Month, aes(x = Month.of.absence, y = AbsenteeismMonth
   geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4) +
   xlab("Month of Absence") +
   theme_bw() +
+  theme(axis.text.x = element_text(size = 6, angle = 65, hjust = 1)) +
   ylab("Absenteeism time in hours") +
   ggtitle("Absenteeism Hours by Month")
+
+Absenteeism_data_by_Groups <- Absenteeism_data %>%
+  group_by(ID, Absence.levels) %>%
+  mutate(AbsenteeismSeasonHours = sum(Absenteeism.time.in.hours)) %>%
+  filter(row_number()==1)
+
+# Absenteeism Hours by Reason per Group
+ggplot(Absenteeism_data_by_Groups, aes(x = Reason.for.absence, y = AbsenteeismSeasonHours, fill = Absence.levels)) +
+  geom_bar(stat="identity") +
+  xlab("Reason for absence") +
+  expand_limits(y=c(0.0, 50.0)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 6, angle = 65, hjust = 1)) +
+  ylab("Absenteeism time in hours") +
+  labs("Groups") +
+  ggtitle("Absenteeism Hours by Reason per Group")
 
 ## @knitr dataAnalysis
 
@@ -242,4 +267,25 @@ abs_km.out <- kmeans(Absenteeism_data_numeric, K)
 
 # Plot K-means Clusters
 autoplot(abs_km.out, data = Absenteeism_data_numeric, frame = TRUE, frame.type = 'norm', label = TRUE, label.size = K)
+
+## @knitr svmClassification
+
+# Split the dataset into 80% training and 20% testing datasets
+traindata <- Absenteeism_data[1:592,]
+testdata <- Absenteeism_data[593:740,]
+
+# Train an SVM classifier
+svm_classifier <- ksvm(Absence.levels ~ ., data = traindata, kernel = "vanilladot")
+svm_classifier
+
+# Training error is around 13%.
+
+# Evaluate the model
+svm_predictions <- predict(svm_classifier, testdata)
+table(svm_predictions, testdata$Absence.levels)
+agreement <- svm_predictions == testdata$Absence.levels
+table(agreement)
+
+# The classifier is correct in 116 out of 148 test data points.
+
 

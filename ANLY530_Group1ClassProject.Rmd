@@ -48,7 +48,7 @@ Let us start by [Prepping] and [Loading the Data Sheets]
 ```
 
 # Initial Work
--------------
+--------------
 
 ## Data Exploration:
 
@@ -58,6 +58,13 @@ Let us start by [Prepping] and [Loading the Data Sheets]
 ## Data Analysis:
 
 ```{r dataAnalysis, warning=FALSE}
+```
+
+# Models Training
+-----------------
+
+## SVM Classifier
+```{r svmClassification, warning=FALSE}
 ```
 
 ## Analysis
