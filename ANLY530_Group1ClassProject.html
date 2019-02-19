@@ -273,7 +273,8 @@ $(document).ready(function () {
 ## [15] &quot;Social.drinker&quot;                  &quot;Social.smoker&quot;                  
 ## [17] &quot;Pet&quot;                             &quot;Weight&quot;                         
 ## [19] &quot;Height&quot;                          &quot;Body.mass.index&quot;                
-## [21] &quot;Absenteeism.time.in.hours&quot;       &quot;Absence.levels&quot;</code></pre>
+## [21] &quot;Absenteeism.time.in.hours&quot;       &quot;Row#&quot;                           
+## [23] &quot;Absence.levels&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Absenteeism_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summary</span>()</code></pre></div>
 <pre><code>##        ID                                            Reason.for.absence
 ##  Min.   : 1.00   medical consultation                         :149     
@@ -323,14 +324,14 @@ $(document).ready(function () {
 ##  3rd Qu.:1.0000   3rd Qu.: 89.00   3rd Qu.:172.0   3rd Qu.:31.00  
 ##  Max.   :8.0000   Max.   :108.00   Max.   :196.0   Max.   :38.00  
 ##                                                                   
-##  Absenteeism.time.in.hours Absence.levels
-##  Min.   :  0.000           Group 0: 44   
-##  1st Qu.:  2.000           Group 1: 88   
-##  Median :  3.000           Group 2:157   
-##  Mean   :  6.924           Group 3:112   
-##  3rd Qu.:  8.000           Group 4: 68   
-##  Max.   :120.000           Group 5:208   
-##                            Group 6: 63</code></pre>
+##  Absenteeism.time.in.hours      Row#       Absence.levels
+##  Min.   :  0.000           Min.   :  1.0   Group 0: 44   
+##  1st Qu.:  2.000           1st Qu.:185.8   Group 1: 88   
+##  Median :  3.000           Median :370.5   Group 2:157   
+##  Mean   :  6.924           Mean   :370.5   Group 3:112   
+##  3rd Qu.:  8.000           3rd Qu.:555.2   Group 4: 68   
+##  Max.   :120.000           Max.   :740.0   Group 5:208   
+##                                            Group 6: 63</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Absenteeism_data_by_Reason &lt;-<span class="st"> </span>Absenteeism_data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(ID, Reason.for.absence) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">AbsenteeismReasonHours =</span> <span class="kw">sum</span>(Absenteeism.time.in.hours)) <span class="op">%&gt;%</span>
@@ -420,11 +421,10 @@ columnIDs &lt;-<span class="st"> </span><span class="kw">which</span>(<span clas
 
 <span class="co"># Convert all the dataframe to numeric</span>
 Absenteeism_data_numeric &lt;-<span class="st"> </span>Absenteeism_data <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">mutate_each</span>(<span class="kw">funs</span>(as.numeric), columnIDs)</code></pre></div>
-<pre><code>## `mutate_each()` is deprecated.
-## Use `mutate_all()`, `mutate_at()` or `mutate_if()` instead.
-## To map `funs` over a selection of variables, use `mutate_at()`</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sapply</span>(Absenteeism_data_numeric, class) <span class="co"># Check that all columns were converted to numeric</span></code></pre></div>
+<span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="st">`</span><span class="dt">Row#</span><span class="st">`</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Ignore Row#</span>
+<span class="st">  </span><span class="kw">mutate_all</span>(<span class="kw">funs</span>(as.numeric), columnIDs)
+
+<span class="kw">sapply</span>(Absenteeism_data_numeric, class) <span class="co"># Check that all columns were converted to numeric</span></code></pre></div>
 <pre><code>##                              ID              Reason.for.absence 
 ##                       &quot;numeric&quot;                       &quot;numeric&quot; 
 ##                Month.of.absence                 Day.of.the.week 
@@ -617,13 +617,20 @@ abs_km.out &lt;-<span class="st"> </span><span class="kw">kmeans</span>(Absentee
 <div id="svm-classifier" class="section level2">
 <h2>SVM Classifier</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Split the dataset into 80% training and 20% testing datasets</span>
-traindata &lt;-<span class="st"> </span>Absenteeism_data[<span class="dv">1</span><span class="op">:</span><span class="dv">592</span>,]
-testdata &lt;-<span class="st"> </span>Absenteeism_data[<span class="dv">593</span><span class="op">:</span><span class="dv">740</span>,]
+abs_traindata &lt;-<span class="st"> </span>Absenteeism_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(<span class="fl">0.80</span>) <span class="co">#[1:592,]</span>
+abs_testdata &lt;-<span class="st"> </span>Absenteeism_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">anti_join</span>(abs_traindata, <span class="dt">by=</span><span class="st">&quot;Row#&quot;</span>) <span class="co">#[593:740,]</span>
 
-<span class="co"># Train an SVM classifier</span>
-svm_classifier &lt;-<span class="st"> </span><span class="kw">ksvm</span>(Absence.levels <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> traindata, <span class="dt">kernel =</span> <span class="st">&quot;vanilladot&quot;</span>)</code></pre></div>
+abs_traindata &lt;-<span class="st"> </span>abs_traindata <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="st">`</span><span class="dt">Row#</span><span class="st">`</span>) <span class="co"># Ignore Row#</span>
+abs_testdata &lt;-<span class="st"> </span>abs_testdata <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="st">`</span><span class="dt">Row#</span><span class="st">`</span>) <span class="co"># Ignore Row#</span>
+
+abs_traindata <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dim</span>()</code></pre></div>
+<pre><code>## [1] 592  22</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">abs_testdata <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dim</span>()</code></pre></div>
+<pre><code>## [1] 148  22</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Train an SVM classifier</span>
+abs_svm_classifier &lt;-<span class="st"> </span><span class="kw">ksvm</span>(Absence.levels <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> abs_traindata, <span class="dt">kernel =</span> <span class="st">&quot;vanilladot&quot;</span>)</code></pre></div>
 <pre><code>##  Setting default kernel parameters</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">svm_classifier</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">abs_svm_classifier</code></pre></div>
 <pre><code>## Support Vector Machine object of class &quot;ksvm&quot; 
 ## 
 ## SV type: C-svc  (classification) 
@@ -631,29 +638,38 @@ svm_classifier &lt;-<span class="st"> </span><span class="kw">ksvm</span>(Absenc
 ## 
 ## Linear (vanilla) kernel function. 
 ## 
-## Number of Support Vectors : 479 
+## Number of Support Vectors : 487 
 ## 
-## Objective Function Value : -2.0463 -2.0902 -0.9201 -0.8669 -0.7689 -0.3344 -96.9325 -58.661 -28.282 -5.835 -1.2689 -91.2877 -46.5299 -7.9422 -1.4476 -58.3162 -11.4367 -1.6699 -22.2027 -1.9635 -4.4673 
-## Training error : 0.157095</code></pre>
+## Objective Function Value : -2.9364 -3.1944 -2.2481 -1.556 -1.6919 -0.4888 -90.833 -62.0506 -30.1339 -7.6831 -1.6485 -122.4896 -49.1882 -10.4576 -1.8738 -46.6025 -15.059 -2.156 -27.9636 -2.5192 -5.8824 
+## Training error : 0.179054</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Training error is around 13%.</span>
 
 <span class="co"># Evaluate the model</span>
-svm_predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(svm_classifier, testdata)
-<span class="kw">table</span>(svm_predictions, testdata<span class="op">$</span>Absence.levels)</code></pre></div>
-<pre><code>##                
-## svm_predictions Group 0 Group 1 Group 2 Group 3 Group 4 Group 5 Group 6
-##         Group 0       4       0       0       0       0       0       0
-##         Group 1       3       1       5       4       0       0       0
-##         Group 2       0       3      33      13       3       0       0
-##         Group 3       0       0      15      13       0       0       0
-##         Group 4       0       0       0       1       3       0       0
-##         Group 5       0       0       0       0       0      37       0
-##         Group 6       0       0       0       0       0       0      10</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">agreement &lt;-<span class="st"> </span>svm_predictions <span class="op">==</span><span class="st"> </span>testdata<span class="op">$</span>Absence.levels
-<span class="kw">table</span>(agreement)</code></pre></div>
-<pre><code>## agreement
+abs_svm_predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(abs_svm_classifier, abs_testdata)
+<span class="kw">table</span>(abs_svm_predictions, abs_testdata<span class="op">$</span>Absence.levels)</code></pre></div>
+<pre><code>##                    
+## abs_svm_predictions Group 0 Group 1 Group 2 Group 3 Group 4 Group 5
+##             Group 0       7       0       0       0       0       0
+##             Group 1       0       9       9       1       1       0
+##             Group 2       0       6      17       7       2       0
+##             Group 3       0       0       5      12       3       0
+##             Group 4       0       1       1       4       7       0
+##             Group 5       0       0       0       0       0      36
+##             Group 6       0       0       0       0       0       0
+##                    
+## abs_svm_predictions Group 6
+##             Group 0       0
+##             Group 1       0
+##             Group 2       0
+##             Group 3       0
+##             Group 4       0
+##             Group 5       0
+##             Group 6      20</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">abs_agreement &lt;-<span class="st"> </span>abs_svm_predictions <span class="op">==</span><span class="st"> </span>abs_testdata<span class="op">$</span>Absence.levels
+<span class="kw">table</span>(abs_agreement)</code></pre></div>
+<pre><code>## abs_agreement
 ## FALSE  TRUE 
-##    47   101</code></pre>
+##    40   108</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The classifier is correct in 116 out of 148 test data points.</span></code></pre></div>
 </div>
 <div id="analysis" class="section level2">
@@ -688,6 +704,9 @@ svm_predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(sv
 <span class="kw">library</span>(ggfortify)
 <span class="kw">library</span>(base)
 <span class="kw">library</span>(kernlab)
+<span class="kw">library</span>(gmodels)
+<span class="kw">library</span>(corrplot)
+<span class="kw">library</span>(Hmisc)
 <span class="kw">library</span>(cluster)
 <span class="kw">library</span>(rpart)
 <span class="kw">library</span>(rpart.plot) 
@@ -809,6 +828,7 @@ Absenteeism_data &lt;-<span class="st"> </span>Absenteeism_at_work_file <span cl
     <span class="dt">Month.of.absence =</span> <span class="kw">factor</span>(Month.of.absence, <span class="dt">labels =</span> twelve.months.and.none),
     <span class="dt">Reason.for.absence =</span> <span class="kw">factor</span>(Reason.for.absence, <span class="dt">labels =</span> twentyeight.reasons),
     <span class="dt">Seasons =</span> <span class="kw">factor</span>(Seasons, <span class="dt">labels =</span> four.seasons),
+    <span class="st">`</span><span class="dt">Row#</span><span class="st">`</span> =<span class="st"> </span><span class="kw">row_number</span>(),
     <span class="dt">Absence.levels =</span> <span class="kw">cut</span>(
       Absenteeism.time.in.hours,
       <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">9</span>, <span class="kw">max</span>(Absenteeism.time.in.hours) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>),

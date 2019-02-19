@@ -26,6 +26,9 @@ library(ggthemes)
 library(ggfortify)
 library(base)
 library(kernlab)
+library(gmodels)
+library(corrplot)
+library(Hmisc)
 library(cluster)
 library(rpart)
 library(rpart.plot) 
@@ -147,6 +150,7 @@ Absenteeism_data <- Absenteeism_at_work_file %>%
     Month.of.absence = factor(Month.of.absence, labels = twelve.months.and.none),
     Reason.for.absence = factor(Reason.for.absence, labels = twentyeight.reasons),
     Seasons = factor(Seasons, labels = four.seasons),
+    `Row#` = row_number(),
     Absence.levels = cut(
       Absenteeism.time.in.hours,
       breaks = c(0,1,2,3,4,8,9, max(Absenteeism.time.in.hours) + 1),
@@ -249,7 +253,8 @@ columnIDs <- which(!names(Absenteeism_data)%in%c())
 
 # Convert all the dataframe to numeric
 Absenteeism_data_numeric <- Absenteeism_data %>%
-  mutate_each(funs(as.numeric), columnIDs)
+  select(-`Row#`) %>% # Ignore Row#
+  mutate_all(funs(as.numeric), columnIDs)
 
 sapply(Absenteeism_data_numeric, class) # Check that all columns were converted to numeric
 
@@ -271,21 +276,29 @@ autoplot(abs_km.out, data = Absenteeism_data_numeric, frame = TRUE, frame.type =
 ## @knitr svmClassification
 
 # Split the dataset into 80% training and 20% testing datasets
-traindata <- Absenteeism_data[1:592,]
-testdata <- Absenteeism_data[593:740,]
+abs_traindata <- Absenteeism_data %>% sample_frac(0.80) #[1:592,]
+abs_testdata <- Absenteeism_data %>% anti_join(abs_traindata, by="Row#") #[593:740,]
+
+abs_traindata <- abs_traindata %>% select(-`Row#`) # Ignore Row#
+abs_testdata <- abs_testdata %>% select(-`Row#`) # Ignore Row#
+
+abs_traindata %>% dim()
+abs_testdata %>% dim()
 
 # Train an SVM classifier
-svm_classifier <- ksvm(Absence.levels ~ ., data = traindata, kernel = "vanilladot")
-svm_classifier
+abs_svm_classifier <- ksvm(Absence.levels ~ ., data = abs_traindata, kernel = "vanilladot")
+abs_svm_classifier
 
 # Training error is around 13%.
 
 # Evaluate the model
-svm_predictions <- predict(svm_classifier, testdata)
-table(svm_predictions, testdata$Absence.levels)
-agreement <- svm_predictions == testdata$Absence.levels
-table(agreement)
+abs_svm_predictions <- predict(abs_svm_classifier, abs_testdata)
+table(abs_svm_predictions, abs_testdata$Absence.levels)
+abs_agreement <- abs_svm_predictions == abs_testdata$Absence.levels
+table(abs_agreement)
 
 # The classifier is correct in 116 out of 148 test data points.
+
+## @knitr naiveBayesClassification
 
 
