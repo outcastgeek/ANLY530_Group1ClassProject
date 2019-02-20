@@ -251,6 +251,9 @@ ggplot(Absenteeism_data_by_Groups, aes(x = Reason.for.absence, y = AbsenteeismSe
 
 ## @knitr dataAnalysis
 
+# Set Seed
+set.seed(987654321)
+
 # Obtain the column IDs
 columnIDs <- which(!names(Absenteeism_data)%in%c())
 
@@ -262,13 +265,25 @@ Absenteeism_data_numeric <- Absenteeism_data %>%
 sapply(Absenteeism_data_numeric, class) # Check that all columns were converted to numeric
 
 # Obtain the best number of Clusters
-NbClust(Absenteeism_data_numeric, method = "kmeans")
+nc <- NbClust(Absenteeism_data_numeric, method = "kmeans")
+nc
+
+nc_tbl <- table(nc$Best.n[1,])
+
+print(nc_tbl)
+
+nc_df <- nc_tbl %>% as.data.frame()
+
+ggplot(data=nc_df, aes(x=Var1, y=Freq)) +
+  geom_bar(stat="identity") +
+  xlab("Number of Clusters") +
+  theme_bw() +
+  ylab("Number of Criteria") +
+  ggtitle("Recommended number of clusters")
+
 
 # The best number of Cluster nc according to the majority rule
 K = 2
-
-# Set Seed
-set.seed(987654321)
 
 # Perform kmeans clustering
 abs_km.out <- kmeans(Absenteeism_data_numeric, K)
