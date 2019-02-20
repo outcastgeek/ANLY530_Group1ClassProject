@@ -72,7 +72,7 @@ Let us start by [Prepping] and [Loading the Data Sheets]
 ```
 
 Training error is `around 16%`.
-The classifier is `correct in 50 out of 135` test data points.
+The classifier is `correct in 135 out of 185` test data points.
 
 ## Naive Bayes Classifier
 ```{r naiveBayesClassification, warning=FALSE}
