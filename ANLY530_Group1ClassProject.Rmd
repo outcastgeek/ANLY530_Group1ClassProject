@@ -67,8 +67,8 @@ Let us start by [Prepping] and [Loading the Data Sheets]
 ```{r svmClassification, warning=FALSE}
 ```
 
-Training error is `around 16%`.
-The classifier is `correct in 41 out of 107` test data points.
+Training error is `around 18%`.
+The classifier is `correct in 58 out of 127` test data points.
 
 ## Analysis
 

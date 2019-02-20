@@ -5,6 +5,7 @@ install.packages("knitr")
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("ggfortify")
+install.packages("Hmisc")
 install.packages("cluster")
 install.packages("rpart")
 install.packages("rpart.plot") 
@@ -161,6 +162,8 @@ Absenteeism_data <- Absenteeism_at_work_file %>%
 
 ## @knitr dataExploration
 
+Absenteeism_data %>% dim()
+
 Absenteeism_data %>% colnames()
 
 Absenteeism_data %>% summary()
@@ -276,7 +279,7 @@ autoplot(abs_km.out, data = Absenteeism_data_numeric, frame = TRUE, frame.type =
 ## @knitr svmClassification
 
 # Split the dataset into 80% training and 20% testing datasets
-abs_traindata <- Absenteeism_data %>% sample_frac(0.80) #[1:592,]
+abs_traindata <- Absenteeism_data %>% sample_frac(0.75) #[1:592,]
 abs_testdata <- Absenteeism_data %>% anti_join(abs_traindata, by="Row#") #[593:740,]
 
 abs_traindata <- abs_traindata %>% select(-`Row#`) # Ignore Row#
