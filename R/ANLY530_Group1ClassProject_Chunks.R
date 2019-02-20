@@ -25,6 +25,7 @@ library(dplyr)
 library(ggplot2)
 library(ggthemes)
 library(ggfortify)
+library(scales)
 library(base)
 library(kernlab)
 library(gmodels)
@@ -264,6 +265,8 @@ Absenteeism_data_numeric <- Absenteeism_data %>%
 
 sapply(Absenteeism_data_numeric, class) # Check that all columns were converted to numeric
 
+wssplot(Absenteeism_data_numeric)
+
 # Obtain the best number of Clusters
 nc <- NbClust(Absenteeism_data_numeric, method = "kmeans")
 nc
@@ -281,6 +284,7 @@ ggplot(data=nc_df, aes(x=Var1, y=Freq)) +
   ylab("Number of Criteria") +
   ggtitle("Recommended number of clusters")
 
+## @knitr semiSupervisedClassification
 
 # The best number of Cluster nc according to the majority rule
 K = 2
@@ -290,6 +294,49 @@ abs_km.out <- kmeans(Absenteeism_data_numeric, K)
 
 # Plot K-means Clusters
 autoplot(abs_km.out, data = Absenteeism_data_numeric, frame = TRUE, frame.type = 'norm', label = TRUE, label.size = K)
+
+print(abs_km.out$size)
+print(abs_km.out$centers)
+
+Absenteeism_data_numeric %>%
+  select(-Absence.levels) %>%
+  aggregate(
+    by = list(cluster=abs_km.out$cluster),
+    mean
+  ) %>%
+  print()
+
+# Use a confusion or truth table to evaluate how well the k-Means analysis performed
+abs_km.ct <- table(Absenteeism_data_numeric$Absence.levels, abs_km.out$cluster)
+print(abs_km.ct)
+
+
+#Generate a plot of the clusters
+clusplot(Absenteeism_data_numeric, abs_km.out$cluster, main='2D representation of the Cluster solution',
+         color=TRUE, shade=TRUE,
+         labels=2, lines=0)
+
+# Set up Train model for classification
+Absenteeism_data_df <- data.frame(k=abs_km.out$cluster, Absenteeism_data_numeric %>% select(-Absence.levels))
+Absenteeism_data_df %>% dim()
+print(str(Absenteeism_data_df))
+
+Absenteeism_data_rdf <- Absenteeism_data_df[sample(1:nrow(Absenteeism_data_df)), ]
+Absenteeism_data_rdf %>% dim()
+head(Absenteeism_data_rdf)
+
+Absenteeism_data_train <- Absenteeism_data_rdf[1:(as.integer(.75*nrow(Absenteeism_data_rdf))-1), ]
+Absenteeism_data_test <- Absenteeism_data_rdf[(as.integer(.75*nrow(Absenteeism_data_rdf))):nrow(Absenteeism_data_rdf), ]
+
+# Train the classifier and plot the results
+abs.rfit <- rpart(k ~ ., data=Absenteeism_data_train, method="class")
+
+#fancyRpartPlot(abs.rfit) not useful
+rpart.plot(abs.rfit)
+
+# Evaluate the model
+abs.rpred <- predict(abs.rfit, Absenteeism_data_test, type="class")
+print(table(abs.rpred, Absenteeism_data_test$k))
 
 ## @knitr svmClassification
 

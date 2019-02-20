@@ -63,6 +63,10 @@ Let us start by [Prepping] and [Loading the Data Sheets]
 # Models Training
 -----------------
 
+## Semi Supervised Classifier
+```{r semiSupervisedClassification, warning=FALSE}
+```
+
 ## SVM Classifier
 ```{r svmClassification, warning=FALSE}
 ```
