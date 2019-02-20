@@ -71,8 +71,12 @@ Let us start by [Prepping] and [Loading the Data Sheets]
 ```{r svmClassification, warning=FALSE}
 ```
 
-Training error is `around 18%`.
-The classifier is `correct in 58 out of 127` test data points.
+Training error is `around 16%`.
+The classifier is `correct in 50 out of 135` test data points.
+
+## Naive Bayes Classifier
+```{r naiveBayesClassification, warning=FALSE}
+```
 
 ## Analysis
 

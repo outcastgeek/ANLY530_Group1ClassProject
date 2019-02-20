@@ -1028,7 +1028,74 @@ $(document).ready(function () {
 <pre><code>## abs_agreement
 ## FALSE  TRUE 
 ##    50   135</code></pre>
-<p>Training error is <code>around 18%</code>. The classifier is <code>correct in 58 out of 127</code> test data points.</p>
+<p>Training error is <code>around 16%</code>. The classifier is <code>correct in 50 out of 135</code> test data points.</p>
+</div>
+<div id="naive-bayes-classifier" class="section level2">
+<h2>Naive Bayes Classifier</h2>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1">Absenteeism_data_rand &lt;-<span class="st"> </span>(Absenteeism_data  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="st">`</span><span class="dt">Row#</span><span class="st">`</span>))[<span class="kw">order</span>(<span class="kw">runif</span>(<span class="dv">740</span>)),]</a>
+<a class="sourceLine" id="cb58-2" title="2">Absenteeism_data_nb_train &lt;-<span class="st"> </span>Absenteeism_data_rand[<span class="dv">1</span><span class="op">:</span><span class="dv">555</span>,]</a>
+<a class="sourceLine" id="cb58-3" title="3">Absenteeism_data_nb_test &lt;-<span class="st"> </span>Absenteeism_data_rand[<span class="dv">556</span><span class="op">:</span><span class="dv">740</span>,]</a>
+<a class="sourceLine" id="cb58-4" title="4"></a>
+<a class="sourceLine" id="cb58-5" title="5">data_nb &lt;-<span class="st"> </span><span class="kw">naive_bayes</span>(Absence.levels <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>Absenteeism_data_nb_train)</a>
+<a class="sourceLine" id="cb58-6" title="6"><span class="kw">summary</span>(data_nb)</a></code></pre></div>
+<pre><code>##           Length Class  Mode     
+## data       2     -none- list     
+## levels     7     -none- character
+## laplace    1     -none- numeric  
+## tables    21     -none- list     
+## prior      7     table  numeric  
+## usekernel  1     -none- logical  
+## call       3     -none- call</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1">predict_absence &lt;-<span class="st"> </span><span class="kw">predict</span>(data_nb, <span class="dt">newdata=</span> Absenteeism_data_nb_test)</a>
+<a class="sourceLine" id="cb60-2" title="2"></a>
+<a class="sourceLine" id="cb60-3" title="3"><span class="kw">CrossTable</span>(</a>
+<a class="sourceLine" id="cb60-4" title="4">  Absenteeism_data_nb_test<span class="op">$</span>Absence.levels,</a>
+<a class="sourceLine" id="cb60-5" title="5">  predict_absence,</a>
+<a class="sourceLine" id="cb60-6" title="6">  <span class="dt">prop.chisq =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb60-7" title="7">  <span class="dt">prop.c =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb60-8" title="8">  <span class="dt">prop.r =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb60-9" title="9">  <span class="dt">dnn =</span> <span class="kw">c</span>(<span class="st">&#39;Actual Absence&#39;</span>, <span class="st">&#39;Predicted Absence&#39;</span>)</a>
+<a class="sourceLine" id="cb60-10" title="10">)</a></code></pre></div>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  185 
+## 
+##  
+##                | Predicted Absence 
+## Actual Absence |   Group 0 |   Group 1 |   Group 2 |   Group 3 |   Group 4 |   Group 5 |   Group 6 | Row Total | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+##        Group 0 |         8 |         0 |         0 |         0 |         0 |         0 |         0 |         8 | 
+##                |     0.043 |     0.000 |     0.000 |     0.000 |     0.000 |     0.000 |     0.000 |           | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+##        Group 1 |         0 |        20 |         1 |         0 |         0 |         3 |         0 |        24 | 
+##                |     0.000 |     0.108 |     0.005 |     0.000 |     0.000 |     0.016 |     0.000 |           | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+##        Group 2 |         0 |         0 |        41 |         1 |         0 |         0 |         1 |        43 | 
+##                |     0.000 |     0.000 |     0.222 |     0.005 |     0.000 |     0.000 |     0.005 |           | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+##        Group 3 |         0 |         1 |         0 |        22 |         1 |         4 |         0 |        28 | 
+##                |     0.000 |     0.005 |     0.000 |     0.119 |     0.005 |     0.022 |     0.000 |           | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+##        Group 4 |         0 |         0 |         1 |         0 |        18 |         1 |         0 |        20 | 
+##                |     0.000 |     0.000 |     0.005 |     0.000 |     0.097 |     0.005 |     0.000 |           | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+##        Group 5 |         0 |         0 |         0 |         0 |         0 |        48 |         1 |        49 | 
+##                |     0.000 |     0.000 |     0.000 |     0.000 |     0.000 |     0.259 |     0.005 |           | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+##        Group 6 |         0 |         1 |         0 |         3 |         0 |         2 |         7 |        13 | 
+##                |     0.000 |     0.005 |     0.000 |     0.016 |     0.000 |     0.011 |     0.038 |           | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+##   Column Total |         8 |        22 |        43 |        26 |        19 |        58 |         9 |       185 | 
+## ---------------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|
+## 
+## </code></pre>
 </div>
 <div id="analysis" class="section level2">
 <h2>Analysis</h2>
@@ -1039,163 +1106,163 @@ $(document).ready(function () {
 <h1>Appendix:</h1>
 <div id="required-libraries" class="section level3">
 <h3>Required Libraries</h3>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;knitr&quot;</span>)</a>
-<a class="sourceLine" id="cb58-2" title="2"><span class="co">#install.packages(&quot;kableExtra&quot;)</span></a>
-<a class="sourceLine" id="cb58-3" title="3"><span class="kw">install.packages</span>(<span class="st">&quot;dplyr&quot;</span>)</a>
-<a class="sourceLine" id="cb58-4" title="4"><span class="kw">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</a>
-<a class="sourceLine" id="cb58-5" title="5"><span class="kw">install.packages</span>(<span class="st">&quot;ggfortify&quot;</span>)</a>
-<a class="sourceLine" id="cb58-6" title="6"><span class="kw">install.packages</span>(<span class="st">&quot;Hmisc&quot;</span>)</a>
-<a class="sourceLine" id="cb58-7" title="7"><span class="kw">install.packages</span>(<span class="st">&quot;cluster&quot;</span>)</a>
-<a class="sourceLine" id="cb58-8" title="8"><span class="kw">install.packages</span>(<span class="st">&quot;rpart&quot;</span>)</a>
-<a class="sourceLine" id="cb58-9" title="9"><span class="kw">install.packages</span>(<span class="st">&quot;rpart.plot&quot;</span>) </a>
-<a class="sourceLine" id="cb58-10" title="10"><span class="kw">install.packages</span>(<span class="st">&quot;RColorBrewer&quot;</span>) </a>
-<a class="sourceLine" id="cb58-11" title="11"><span class="co">#install.packages(&quot;rattle&quot;)</span></a>
-<a class="sourceLine" id="cb58-12" title="12"><span class="kw">install.packages</span>(<span class="st">&quot;NbClust&quot;</span>)</a>
-<a class="sourceLine" id="cb58-13" title="13"><span class="kw">install.packages</span>(<span class="st">&quot;ModelMetrics&quot;</span>)</a>
-<a class="sourceLine" id="cb58-14" title="14"><span class="kw">install.packages</span>(<span class="st">&quot;generics&quot;</span>)</a>
-<a class="sourceLine" id="cb58-15" title="15"><span class="kw">install.packages</span>(<span class="st">&quot;gower&quot;</span>)</a>
-<a class="sourceLine" id="cb58-16" title="16"><span class="kw">install.packages</span>(<span class="st">&quot;bindrcpp&quot;</span>)</a>
-<a class="sourceLine" id="cb58-17" title="17"><span class="kw">install.packages</span>(<span class="st">&quot;caret&quot;</span>, <span class="dt">dependencies =</span> <span class="kw">c</span>(<span class="st">&quot;Depends&quot;</span>, <span class="st">&quot;Suggests&quot;</span>))</a>
-<a class="sourceLine" id="cb58-18" title="18"><span class="kw">install.packages</span>(<span class="st">&quot;naivebayes&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" title="1"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb59-2" title="2"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb59-3" title="3"><span class="kw">library</span>(ggthemes)</a>
-<a class="sourceLine" id="cb59-4" title="4"><span class="kw">library</span>(ggfortify)</a>
-<a class="sourceLine" id="cb59-5" title="5"><span class="kw">library</span>(scales)</a>
-<a class="sourceLine" id="cb59-6" title="6"><span class="kw">library</span>(base)</a>
-<a class="sourceLine" id="cb59-7" title="7"><span class="kw">library</span>(kernlab)</a>
-<a class="sourceLine" id="cb59-8" title="8"><span class="kw">library</span>(gmodels)</a>
-<a class="sourceLine" id="cb59-9" title="9"><span class="kw">library</span>(corrplot)</a>
-<a class="sourceLine" id="cb59-10" title="10"><span class="kw">library</span>(Hmisc)</a>
-<a class="sourceLine" id="cb59-11" title="11"><span class="kw">library</span>(cluster)</a>
-<a class="sourceLine" id="cb59-12" title="12"><span class="kw">library</span>(rpart)</a>
-<a class="sourceLine" id="cb59-13" title="13"><span class="kw">library</span>(rpart.plot) </a>
-<a class="sourceLine" id="cb59-14" title="14"><span class="kw">library</span>(RColorBrewer) </a>
-<a class="sourceLine" id="cb59-15" title="15"><span class="co">#library(rattle)</span></a>
-<a class="sourceLine" id="cb59-16" title="16"><span class="kw">library</span>(NbClust)</a>
-<a class="sourceLine" id="cb59-17" title="17"><span class="kw">library</span>(ModelMetrics)</a>
-<a class="sourceLine" id="cb59-18" title="18"><span class="kw">library</span>(generics)</a>
-<a class="sourceLine" id="cb59-19" title="19"><span class="kw">library</span>(gower)</a>
-<a class="sourceLine" id="cb59-20" title="20"><span class="kw">library</span>(bindrcpp)</a>
-<a class="sourceLine" id="cb59-21" title="21"><span class="kw">library</span>(caret)</a>
-<a class="sourceLine" id="cb59-22" title="22"><span class="kw">library</span>(naivebayes)</a></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;knitr&quot;</span>)</a>
+<a class="sourceLine" id="cb62-2" title="2"><span class="co">#install.packages(&quot;kableExtra&quot;)</span></a>
+<a class="sourceLine" id="cb62-3" title="3"><span class="kw">install.packages</span>(<span class="st">&quot;dplyr&quot;</span>)</a>
+<a class="sourceLine" id="cb62-4" title="4"><span class="kw">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</a>
+<a class="sourceLine" id="cb62-5" title="5"><span class="kw">install.packages</span>(<span class="st">&quot;ggfortify&quot;</span>)</a>
+<a class="sourceLine" id="cb62-6" title="6"><span class="kw">install.packages</span>(<span class="st">&quot;Hmisc&quot;</span>)</a>
+<a class="sourceLine" id="cb62-7" title="7"><span class="kw">install.packages</span>(<span class="st">&quot;cluster&quot;</span>)</a>
+<a class="sourceLine" id="cb62-8" title="8"><span class="kw">install.packages</span>(<span class="st">&quot;rpart&quot;</span>)</a>
+<a class="sourceLine" id="cb62-9" title="9"><span class="kw">install.packages</span>(<span class="st">&quot;rpart.plot&quot;</span>) </a>
+<a class="sourceLine" id="cb62-10" title="10"><span class="kw">install.packages</span>(<span class="st">&quot;RColorBrewer&quot;</span>) </a>
+<a class="sourceLine" id="cb62-11" title="11"><span class="co">#install.packages(&quot;rattle&quot;)</span></a>
+<a class="sourceLine" id="cb62-12" title="12"><span class="kw">install.packages</span>(<span class="st">&quot;NbClust&quot;</span>)</a>
+<a class="sourceLine" id="cb62-13" title="13"><span class="kw">install.packages</span>(<span class="st">&quot;ModelMetrics&quot;</span>)</a>
+<a class="sourceLine" id="cb62-14" title="14"><span class="kw">install.packages</span>(<span class="st">&quot;generics&quot;</span>)</a>
+<a class="sourceLine" id="cb62-15" title="15"><span class="kw">install.packages</span>(<span class="st">&quot;gower&quot;</span>)</a>
+<a class="sourceLine" id="cb62-16" title="16"><span class="kw">install.packages</span>(<span class="st">&quot;bindrcpp&quot;</span>)</a>
+<a class="sourceLine" id="cb62-17" title="17"><span class="kw">install.packages</span>(<span class="st">&quot;caret&quot;</span>, <span class="dt">dependencies =</span> <span class="kw">c</span>(<span class="st">&quot;Depends&quot;</span>, <span class="st">&quot;Suggests&quot;</span>))</a>
+<a class="sourceLine" id="cb62-18" title="18"><span class="kw">install.packages</span>(<span class="st">&quot;naivebayes&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb63-2" title="2"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb63-3" title="3"><span class="kw">library</span>(ggthemes)</a>
+<a class="sourceLine" id="cb63-4" title="4"><span class="kw">library</span>(ggfortify)</a>
+<a class="sourceLine" id="cb63-5" title="5"><span class="kw">library</span>(scales)</a>
+<a class="sourceLine" id="cb63-6" title="6"><span class="kw">library</span>(base)</a>
+<a class="sourceLine" id="cb63-7" title="7"><span class="kw">library</span>(kernlab)</a>
+<a class="sourceLine" id="cb63-8" title="8"><span class="kw">library</span>(gmodels)</a>
+<a class="sourceLine" id="cb63-9" title="9"><span class="kw">library</span>(corrplot)</a>
+<a class="sourceLine" id="cb63-10" title="10"><span class="kw">library</span>(Hmisc)</a>
+<a class="sourceLine" id="cb63-11" title="11"><span class="kw">library</span>(cluster)</a>
+<a class="sourceLine" id="cb63-12" title="12"><span class="kw">library</span>(rpart)</a>
+<a class="sourceLine" id="cb63-13" title="13"><span class="kw">library</span>(rpart.plot) </a>
+<a class="sourceLine" id="cb63-14" title="14"><span class="kw">library</span>(RColorBrewer) </a>
+<a class="sourceLine" id="cb63-15" title="15"><span class="co">#library(rattle)</span></a>
+<a class="sourceLine" id="cb63-16" title="16"><span class="kw">library</span>(NbClust)</a>
+<a class="sourceLine" id="cb63-17" title="17"><span class="kw">library</span>(ModelMetrics)</a>
+<a class="sourceLine" id="cb63-18" title="18"><span class="kw">library</span>(generics)</a>
+<a class="sourceLine" id="cb63-19" title="19"><span class="kw">library</span>(gower)</a>
+<a class="sourceLine" id="cb63-20" title="20"><span class="kw">library</span>(bindrcpp)</a>
+<a class="sourceLine" id="cb63-21" title="21"><span class="kw">library</span>(caret)</a>
+<a class="sourceLine" id="cb63-22" title="22"><span class="kw">library</span>(naivebayes)</a></code></pre></div>
 </div>
 <div id="helper-functions" class="section level3">
 <h3>Helper Functions</h3>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" title="1"><span class="co"># Obtains the full File Path</span></a>
-<a class="sourceLine" id="cb60-2" title="2">fullFilePath &lt;-<span class="st"> </span><span class="cf">function</span>(fileName)</a>
-<a class="sourceLine" id="cb60-3" title="3">{</a>
-<a class="sourceLine" id="cb60-4" title="4">  fileFolder &lt;-<span class="st"> &quot;./data/&quot;</span></a>
-<a class="sourceLine" id="cb60-5" title="5">  fileNamePath &lt;-<span class="st"> </span><span class="kw">paste</span>(fileFolder, fileName, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a>
-<a class="sourceLine" id="cb60-6" title="6">  fileNamePath</a>
-<a class="sourceLine" id="cb60-7" title="7">}</a>
-<a class="sourceLine" id="cb60-8" title="8"></a>
-<a class="sourceLine" id="cb60-9" title="9"><span class="co"># Converts column of Timestamps to Date</span></a>
-<a class="sourceLine" id="cb60-10" title="10">ttColToDate &lt;-<span class="st"> </span><span class="cf">function</span>(dFrame, colName) {</a>
-<a class="sourceLine" id="cb60-11" title="11">  dFrame[colName] &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(dFrame[colName], <span class="dt">origin=</span><span class="st">&quot;1970-01-01&quot;</span>)</a>
-<a class="sourceLine" id="cb60-12" title="12">  dFrame</a>
-<a class="sourceLine" id="cb60-13" title="13">}</a>
-<a class="sourceLine" id="cb60-14" title="14"></a>
-<a class="sourceLine" id="cb60-15" title="15"><span class="co"># Converts column to utf-8</span></a>
-<a class="sourceLine" id="cb60-16" title="16">toUtf8 &lt;-<span class="st"> </span><span class="cf">function</span>(column) {</a>
-<a class="sourceLine" id="cb60-17" title="17">  columnUtf8 &lt;-<span class="st"> </span><span class="kw">iconv</span>(<span class="kw">enc2utf8</span>(column), <span class="dt">sub =</span> <span class="st">&quot;byte&quot;</span>)</a>
-<a class="sourceLine" id="cb60-18" title="18">  columnUtf8</a>
-<a class="sourceLine" id="cb60-19" title="19">}</a>
-<a class="sourceLine" id="cb60-20" title="20"></a>
-<a class="sourceLine" id="cb60-21" title="21"><span class="co"># Formats Data</span></a>
-<a class="sourceLine" id="cb60-22" title="22">fmt &lt;-<span class="st"> </span><span class="cf">function</span>(dt, <span class="dt">caption =</span> <span class="st">&quot;&quot;</span>) {</a>
-<a class="sourceLine" id="cb60-23" title="23">  fmt_dt &lt;-<span class="st"> </span>dt <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb60-24" title="24"><span class="st">    </span><span class="kw">kable</span>(<span class="st">&quot;latex&quot;</span>, <span class="dt">longtable =</span> T, <span class="dt">booktabs =</span> T)</a>
-<a class="sourceLine" id="cb60-25" title="25">  fmt_dt</a>
-<a class="sourceLine" id="cb60-26" title="26">}</a>
-<a class="sourceLine" id="cb60-27" title="27"></a>
-<a class="sourceLine" id="cb60-28" title="28"><span class="co"># Style Data</span></a>
-<a class="sourceLine" id="cb60-29" title="29">style &lt;-<span class="st"> </span><span class="cf">function</span>(dt, <span class="dt">full_width =</span> F, <span class="dt">angle =</span> <span class="dv">0</span>) {</a>
-<a class="sourceLine" id="cb60-30" title="30">  style_dt &lt;-<span class="st"> </span>dt <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb60-31" title="31"><span class="st">    </span><span class="kw">kable_styling</span>(<span class="dt">latex_options =</span> <span class="st">&quot;striped&quot;</span>, <span class="dt">full_width =</span> full_width) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb60-32" title="32"><span class="st">    </span><span class="kw">row_spec</span>(<span class="dv">0</span>, <span class="dt">angle =</span> angle)</a>
-<a class="sourceLine" id="cb60-33" title="33">  style_dt</a>
-<a class="sourceLine" id="cb60-34" title="34">}</a>
-<a class="sourceLine" id="cb60-35" title="35"></a>
-<a class="sourceLine" id="cb60-36" title="36"><span class="co">#Plot the within (cluster) sum of squares to determine the initial value for &quot;k&quot; </span></a>
-<a class="sourceLine" id="cb60-37" title="37">wssplot &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">nc=</span><span class="dv">15</span>, <span class="dt">seed=</span><span class="dv">1234</span>){ </a>
-<a class="sourceLine" id="cb60-38" title="38">  wss &lt;-<span class="st"> </span>(<span class="kw">nrow</span>(data)<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span><span class="kw">sum</span>(<span class="kw">apply</span>(data,<span class="dv">2</span>,var)) </a>
-<a class="sourceLine" id="cb60-39" title="39">  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span>nc){ </a>
-<a class="sourceLine" id="cb60-40" title="40">    <span class="kw">set.seed</span>(seed) </a>
-<a class="sourceLine" id="cb60-41" title="41">    wss[i] &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">kmeans</span>(data, <span class="dt">centers=</span>i)<span class="op">$</span>withinss)} </a>
-<a class="sourceLine" id="cb60-42" title="42">  <span class="kw">plot</span>(<span class="dv">1</span><span class="op">:</span>nc, wss, <span class="dt">type=</span><span class="st">&quot;b&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;Number of Clusters&quot;</span>, </a>
-<a class="sourceLine" id="cb60-43" title="43">       <span class="dt">ylab=</span><span class="st">&quot;Within groups sum of squares&quot;</span>)}</a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" title="1"><span class="co"># Obtains the full File Path</span></a>
+<a class="sourceLine" id="cb64-2" title="2">fullFilePath &lt;-<span class="st"> </span><span class="cf">function</span>(fileName)</a>
+<a class="sourceLine" id="cb64-3" title="3">{</a>
+<a class="sourceLine" id="cb64-4" title="4">  fileFolder &lt;-<span class="st"> &quot;./data/&quot;</span></a>
+<a class="sourceLine" id="cb64-5" title="5">  fileNamePath &lt;-<span class="st"> </span><span class="kw">paste</span>(fileFolder, fileName, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb64-6" title="6">  fileNamePath</a>
+<a class="sourceLine" id="cb64-7" title="7">}</a>
+<a class="sourceLine" id="cb64-8" title="8"></a>
+<a class="sourceLine" id="cb64-9" title="9"><span class="co"># Converts column of Timestamps to Date</span></a>
+<a class="sourceLine" id="cb64-10" title="10">ttColToDate &lt;-<span class="st"> </span><span class="cf">function</span>(dFrame, colName) {</a>
+<a class="sourceLine" id="cb64-11" title="11">  dFrame[colName] &lt;-<span class="st"> </span><span class="kw">as.POSIXct</span>(dFrame[colName], <span class="dt">origin=</span><span class="st">&quot;1970-01-01&quot;</span>)</a>
+<a class="sourceLine" id="cb64-12" title="12">  dFrame</a>
+<a class="sourceLine" id="cb64-13" title="13">}</a>
+<a class="sourceLine" id="cb64-14" title="14"></a>
+<a class="sourceLine" id="cb64-15" title="15"><span class="co"># Converts column to utf-8</span></a>
+<a class="sourceLine" id="cb64-16" title="16">toUtf8 &lt;-<span class="st"> </span><span class="cf">function</span>(column) {</a>
+<a class="sourceLine" id="cb64-17" title="17">  columnUtf8 &lt;-<span class="st"> </span><span class="kw">iconv</span>(<span class="kw">enc2utf8</span>(column), <span class="dt">sub =</span> <span class="st">&quot;byte&quot;</span>)</a>
+<a class="sourceLine" id="cb64-18" title="18">  columnUtf8</a>
+<a class="sourceLine" id="cb64-19" title="19">}</a>
+<a class="sourceLine" id="cb64-20" title="20"></a>
+<a class="sourceLine" id="cb64-21" title="21"><span class="co"># Formats Data</span></a>
+<a class="sourceLine" id="cb64-22" title="22">fmt &lt;-<span class="st"> </span><span class="cf">function</span>(dt, <span class="dt">caption =</span> <span class="st">&quot;&quot;</span>) {</a>
+<a class="sourceLine" id="cb64-23" title="23">  fmt_dt &lt;-<span class="st"> </span>dt <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb64-24" title="24"><span class="st">    </span><span class="kw">kable</span>(<span class="st">&quot;latex&quot;</span>, <span class="dt">longtable =</span> T, <span class="dt">booktabs =</span> T)</a>
+<a class="sourceLine" id="cb64-25" title="25">  fmt_dt</a>
+<a class="sourceLine" id="cb64-26" title="26">}</a>
+<a class="sourceLine" id="cb64-27" title="27"></a>
+<a class="sourceLine" id="cb64-28" title="28"><span class="co"># Style Data</span></a>
+<a class="sourceLine" id="cb64-29" title="29">style &lt;-<span class="st"> </span><span class="cf">function</span>(dt, <span class="dt">full_width =</span> F, <span class="dt">angle =</span> <span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb64-30" title="30">  style_dt &lt;-<span class="st"> </span>dt <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb64-31" title="31"><span class="st">    </span><span class="kw">kable_styling</span>(<span class="dt">latex_options =</span> <span class="st">&quot;striped&quot;</span>, <span class="dt">full_width =</span> full_width) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb64-32" title="32"><span class="st">    </span><span class="kw">row_spec</span>(<span class="dv">0</span>, <span class="dt">angle =</span> angle)</a>
+<a class="sourceLine" id="cb64-33" title="33">  style_dt</a>
+<a class="sourceLine" id="cb64-34" title="34">}</a>
+<a class="sourceLine" id="cb64-35" title="35"></a>
+<a class="sourceLine" id="cb64-36" title="36"><span class="co">#Plot the within (cluster) sum of squares to determine the initial value for &quot;k&quot; </span></a>
+<a class="sourceLine" id="cb64-37" title="37">wssplot &lt;-<span class="st"> </span><span class="cf">function</span>(data, <span class="dt">nc=</span><span class="dv">15</span>, <span class="dt">seed=</span><span class="dv">1234</span>){ </a>
+<a class="sourceLine" id="cb64-38" title="38">  wss &lt;-<span class="st"> </span>(<span class="kw">nrow</span>(data)<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span><span class="kw">sum</span>(<span class="kw">apply</span>(data,<span class="dv">2</span>,var)) </a>
+<a class="sourceLine" id="cb64-39" title="39">  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span>nc){ </a>
+<a class="sourceLine" id="cb64-40" title="40">    <span class="kw">set.seed</span>(seed) </a>
+<a class="sourceLine" id="cb64-41" title="41">    wss[i] &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">kmeans</span>(data, <span class="dt">centers=</span>i)<span class="op">$</span>withinss)} </a>
+<a class="sourceLine" id="cb64-42" title="42">  <span class="kw">plot</span>(<span class="dv">1</span><span class="op">:</span>nc, wss, <span class="dt">type=</span><span class="st">&quot;b&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;Number of Clusters&quot;</span>, </a>
+<a class="sourceLine" id="cb64-43" title="43">       <span class="dt">ylab=</span><span class="st">&quot;Within groups sum of squares&quot;</span>)}</a></code></pre></div>
 </div>
 <div id="prepping" class="section level3">
 <h3>Prepping</h3>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" title="1">twentyeight.reasons &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb61-2" title="2">  <span class="st">&quot;I Certain infectious and parasitic diseases&quot;</span>,</a>
-<a class="sourceLine" id="cb61-3" title="3">  <span class="st">&quot;II Neoplasms&quot;</span>,</a>
-<a class="sourceLine" id="cb61-4" title="4">  <span class="st">&quot;III Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism&quot;</span>,</a>
-<a class="sourceLine" id="cb61-5" title="5">  <span class="st">&quot;IV Endocrine, nutritional and metabolic diseases&quot;</span>,</a>
-<a class="sourceLine" id="cb61-6" title="6">  <span class="st">&quot;V Mental and behavioural disorders&quot;</span>,</a>
-<a class="sourceLine" id="cb61-7" title="7">  <span class="st">&quot;VI Diseases of the nervous system&quot;</span>,</a>
-<a class="sourceLine" id="cb61-8" title="8">  <span class="st">&quot;VII Diseases of the eye and adnexa&quot;</span>,</a>
-<a class="sourceLine" id="cb61-9" title="9">  <span class="st">&quot;VIII Diseases of the ear and mastoid process&quot;</span>,</a>
-<a class="sourceLine" id="cb61-10" title="10">  <span class="st">&quot;IX Diseases of the circulatory system&quot;</span>,</a>
-<a class="sourceLine" id="cb61-11" title="11">  <span class="st">&quot;X Diseases of the respiratory system&quot;</span>,</a>
-<a class="sourceLine" id="cb61-12" title="12">  <span class="st">&quot;XI Diseases of the digestive system&quot;</span>,</a>
-<a class="sourceLine" id="cb61-13" title="13">  <span class="st">&quot;XII Diseases of the skin and subcutaneous tissue&quot;</span>,</a>
-<a class="sourceLine" id="cb61-14" title="14">  <span class="st">&quot;XIII Diseases of the musculoskeletal system and connective tissue&quot;</span>,</a>
-<a class="sourceLine" id="cb61-15" title="15">  <span class="st">&quot;XIV Diseases of the genitourinary system&quot;</span>,</a>
-<a class="sourceLine" id="cb61-16" title="16">  <span class="st">&quot;XV Pregnancy, childbirth and the puerperium&quot;</span>,</a>
-<a class="sourceLine" id="cb61-17" title="17">  <span class="st">&quot;XVI Certain conditions originating in the perinatal period&quot;</span>,</a>
-<a class="sourceLine" id="cb61-18" title="18">  <span class="st">&quot;XVII Congenital malformations, deformations and chromosomal abnormalities&quot;</span>,</a>
-<a class="sourceLine" id="cb61-19" title="19">  <span class="st">&quot;XVIII Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified&quot;</span>,</a>
-<a class="sourceLine" id="cb61-20" title="20">  <span class="st">&quot;XIX Injury, poisoning and certain other consequences of external causes&quot;</span>,</a>
-<a class="sourceLine" id="cb61-21" title="21">  <span class="st">&quot;XX External causes of morbidity and mortality&quot;</span>,</a>
-<a class="sourceLine" id="cb61-22" title="22">  <span class="st">&quot;XXI Factors influencing health status and contact with health services.&quot;</span>,</a>
-<a class="sourceLine" id="cb61-23" title="23">  <span class="st">&quot;patient follow-up&quot;</span>,</a>
-<a class="sourceLine" id="cb61-24" title="24">  <span class="st">&quot;medical consultation&quot;</span>,</a>
-<a class="sourceLine" id="cb61-25" title="25">  <span class="st">&quot; blood donation&quot;</span>,</a>
-<a class="sourceLine" id="cb61-26" title="26">  <span class="st">&quot;laboratory examination&quot;</span>,</a>
-<a class="sourceLine" id="cb61-27" title="27">  <span class="st">&quot;unjustified absence&quot;</span>,</a>
-<a class="sourceLine" id="cb61-28" title="28">  <span class="st">&quot;physiotherapy&quot;</span>,</a>
-<a class="sourceLine" id="cb61-29" title="29">  <span class="st">&quot;dental consultation&quot;</span></a>
-<a class="sourceLine" id="cb61-30" title="30">)</a>
-<a class="sourceLine" id="cb61-31" title="31">four.seasons &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Summer&quot;</span>, <span class="st">&quot;Autumn&quot;</span>, <span class="st">&quot;Winter&quot;</span>, <span class="st">&quot;Spring&quot;</span>)</a>
-<a class="sourceLine" id="cb61-32" title="32">twelve.months.and.none &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb61-33" title="33">  <span class="st">&quot;None&quot;</span>,</a>
-<a class="sourceLine" id="cb61-34" title="34">  <span class="st">&quot;January&quot;</span>,</a>
-<a class="sourceLine" id="cb61-35" title="35">  <span class="st">&quot;February&quot;</span>,</a>
-<a class="sourceLine" id="cb61-36" title="36">  <span class="st">&quot;March&quot;</span>,</a>
-<a class="sourceLine" id="cb61-37" title="37">  <span class="st">&quot;April&quot;</span>,</a>
-<a class="sourceLine" id="cb61-38" title="38">  <span class="st">&quot;May&quot;</span>,</a>
-<a class="sourceLine" id="cb61-39" title="39">  <span class="st">&quot;June&quot;</span>,</a>
-<a class="sourceLine" id="cb61-40" title="40">  <span class="st">&quot;July&quot;</span>,</a>
-<a class="sourceLine" id="cb61-41" title="41">  <span class="st">&quot;August&quot;</span>,</a>
-<a class="sourceLine" id="cb61-42" title="42">  <span class="st">&quot;September&quot;</span>,</a>
-<a class="sourceLine" id="cb61-43" title="43">  <span class="st">&quot;October&quot;</span>,</a>
-<a class="sourceLine" id="cb61-44" title="44">  <span class="st">&quot;November&quot;</span>,</a>
-<a class="sourceLine" id="cb61-45" title="45">  <span class="st">&quot;December&quot;</span></a>
-<a class="sourceLine" id="cb61-46" title="46">)</a></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" title="1">twentyeight.reasons &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb65-2" title="2">  <span class="st">&quot;I Certain infectious and parasitic diseases&quot;</span>,</a>
+<a class="sourceLine" id="cb65-3" title="3">  <span class="st">&quot;II Neoplasms&quot;</span>,</a>
+<a class="sourceLine" id="cb65-4" title="4">  <span class="st">&quot;III Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism&quot;</span>,</a>
+<a class="sourceLine" id="cb65-5" title="5">  <span class="st">&quot;IV Endocrine, nutritional and metabolic diseases&quot;</span>,</a>
+<a class="sourceLine" id="cb65-6" title="6">  <span class="st">&quot;V Mental and behavioural disorders&quot;</span>,</a>
+<a class="sourceLine" id="cb65-7" title="7">  <span class="st">&quot;VI Diseases of the nervous system&quot;</span>,</a>
+<a class="sourceLine" id="cb65-8" title="8">  <span class="st">&quot;VII Diseases of the eye and adnexa&quot;</span>,</a>
+<a class="sourceLine" id="cb65-9" title="9">  <span class="st">&quot;VIII Diseases of the ear and mastoid process&quot;</span>,</a>
+<a class="sourceLine" id="cb65-10" title="10">  <span class="st">&quot;IX Diseases of the circulatory system&quot;</span>,</a>
+<a class="sourceLine" id="cb65-11" title="11">  <span class="st">&quot;X Diseases of the respiratory system&quot;</span>,</a>
+<a class="sourceLine" id="cb65-12" title="12">  <span class="st">&quot;XI Diseases of the digestive system&quot;</span>,</a>
+<a class="sourceLine" id="cb65-13" title="13">  <span class="st">&quot;XII Diseases of the skin and subcutaneous tissue&quot;</span>,</a>
+<a class="sourceLine" id="cb65-14" title="14">  <span class="st">&quot;XIII Diseases of the musculoskeletal system and connective tissue&quot;</span>,</a>
+<a class="sourceLine" id="cb65-15" title="15">  <span class="st">&quot;XIV Diseases of the genitourinary system&quot;</span>,</a>
+<a class="sourceLine" id="cb65-16" title="16">  <span class="st">&quot;XV Pregnancy, childbirth and the puerperium&quot;</span>,</a>
+<a class="sourceLine" id="cb65-17" title="17">  <span class="st">&quot;XVI Certain conditions originating in the perinatal period&quot;</span>,</a>
+<a class="sourceLine" id="cb65-18" title="18">  <span class="st">&quot;XVII Congenital malformations, deformations and chromosomal abnormalities&quot;</span>,</a>
+<a class="sourceLine" id="cb65-19" title="19">  <span class="st">&quot;XVIII Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified&quot;</span>,</a>
+<a class="sourceLine" id="cb65-20" title="20">  <span class="st">&quot;XIX Injury, poisoning and certain other consequences of external causes&quot;</span>,</a>
+<a class="sourceLine" id="cb65-21" title="21">  <span class="st">&quot;XX External causes of morbidity and mortality&quot;</span>,</a>
+<a class="sourceLine" id="cb65-22" title="22">  <span class="st">&quot;XXI Factors influencing health status and contact with health services.&quot;</span>,</a>
+<a class="sourceLine" id="cb65-23" title="23">  <span class="st">&quot;patient follow-up&quot;</span>,</a>
+<a class="sourceLine" id="cb65-24" title="24">  <span class="st">&quot;medical consultation&quot;</span>,</a>
+<a class="sourceLine" id="cb65-25" title="25">  <span class="st">&quot; blood donation&quot;</span>,</a>
+<a class="sourceLine" id="cb65-26" title="26">  <span class="st">&quot;laboratory examination&quot;</span>,</a>
+<a class="sourceLine" id="cb65-27" title="27">  <span class="st">&quot;unjustified absence&quot;</span>,</a>
+<a class="sourceLine" id="cb65-28" title="28">  <span class="st">&quot;physiotherapy&quot;</span>,</a>
+<a class="sourceLine" id="cb65-29" title="29">  <span class="st">&quot;dental consultation&quot;</span></a>
+<a class="sourceLine" id="cb65-30" title="30">)</a>
+<a class="sourceLine" id="cb65-31" title="31">four.seasons &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Summer&quot;</span>, <span class="st">&quot;Autumn&quot;</span>, <span class="st">&quot;Winter&quot;</span>, <span class="st">&quot;Spring&quot;</span>)</a>
+<a class="sourceLine" id="cb65-32" title="32">twelve.months.and.none &lt;-<span class="st"> </span><span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb65-33" title="33">  <span class="st">&quot;None&quot;</span>,</a>
+<a class="sourceLine" id="cb65-34" title="34">  <span class="st">&quot;January&quot;</span>,</a>
+<a class="sourceLine" id="cb65-35" title="35">  <span class="st">&quot;February&quot;</span>,</a>
+<a class="sourceLine" id="cb65-36" title="36">  <span class="st">&quot;March&quot;</span>,</a>
+<a class="sourceLine" id="cb65-37" title="37">  <span class="st">&quot;April&quot;</span>,</a>
+<a class="sourceLine" id="cb65-38" title="38">  <span class="st">&quot;May&quot;</span>,</a>
+<a class="sourceLine" id="cb65-39" title="39">  <span class="st">&quot;June&quot;</span>,</a>
+<a class="sourceLine" id="cb65-40" title="40">  <span class="st">&quot;July&quot;</span>,</a>
+<a class="sourceLine" id="cb65-41" title="41">  <span class="st">&quot;August&quot;</span>,</a>
+<a class="sourceLine" id="cb65-42" title="42">  <span class="st">&quot;September&quot;</span>,</a>
+<a class="sourceLine" id="cb65-43" title="43">  <span class="st">&quot;October&quot;</span>,</a>
+<a class="sourceLine" id="cb65-44" title="44">  <span class="st">&quot;November&quot;</span>,</a>
+<a class="sourceLine" id="cb65-45" title="45">  <span class="st">&quot;December&quot;</span></a>
+<a class="sourceLine" id="cb65-46" title="46">)</a></code></pre></div>
 </div>
 <div id="loading-the-data-sheets" class="section level3">
 <h3>Loading the Data Sheets</h3>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" title="1"><span class="co">#Set Data File Name:</span></a>
-<a class="sourceLine" id="cb62-2" title="2">Absenteeism_at_work_file &lt;-<span class="st"> &quot;Absenteeism_at_work.csv&quot;</span></a>
-<a class="sourceLine" id="cb62-3" title="3"></a>
-<a class="sourceLine" id="cb62-4" title="4"><span class="co"># Absenteeism</span></a>
-<a class="sourceLine" id="cb62-5" title="5">Absenteeism_data &lt;-<span class="st"> </span>Absenteeism_at_work_file <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb62-6" title="6"><span class="st">  </span>fullFilePath <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb62-7" title="7"><span class="st">  </span><span class="kw">read.csv</span>(<span class="dt">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>, <span class="dt">sep =</span> <span class="st">&quot;;&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb62-8" title="8"><span class="st">  </span><span class="kw">mutate</span>(</a>
-<a class="sourceLine" id="cb62-9" title="9">    <span class="dt">Month.of.absence =</span> <span class="kw">factor</span>(Month.of.absence, <span class="dt">labels =</span> twelve.months.and.none),</a>
-<a class="sourceLine" id="cb62-10" title="10">    <span class="dt">Reason.for.absence =</span> <span class="kw">factor</span>(Reason.for.absence, <span class="dt">labels =</span> twentyeight.reasons),</a>
-<a class="sourceLine" id="cb62-11" title="11">    <span class="dt">Seasons =</span> <span class="kw">factor</span>(Seasons, <span class="dt">labels =</span> four.seasons),</a>
-<a class="sourceLine" id="cb62-12" title="12">    <span class="st">`</span><span class="dt">Row#</span><span class="st">`</span> =<span class="st"> </span><span class="kw">row_number</span>(),</a>
-<a class="sourceLine" id="cb62-13" title="13">    <span class="dt">Absence.levels =</span> <span class="kw">cut</span>(</a>
-<a class="sourceLine" id="cb62-14" title="14">      Absenteeism.time.in.hours,</a>
-<a class="sourceLine" id="cb62-15" title="15">      <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">9</span>, <span class="kw">max</span>(Absenteeism.time.in.hours) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb62-16" title="16">      <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;Group 0&quot;</span>, <span class="st">&quot;Group 1&quot;</span>, <span class="st">&quot;Group 2&quot;</span>, <span class="st">&quot;Group 3&quot;</span>, <span class="st">&quot;Group 4&quot;</span>, <span class="st">&quot;Group 5&quot;</span>, <span class="st">&quot;Group 6&quot;</span>),</a>
-<a class="sourceLine" id="cb62-17" title="17">      <span class="dt">right =</span> <span class="ot">FALSE</span></a>
-<a class="sourceLine" id="cb62-18" title="18">    )</a>
-<a class="sourceLine" id="cb62-19" title="19">  )</a></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" title="1"><span class="co">#Set Data File Name:</span></a>
+<a class="sourceLine" id="cb66-2" title="2">Absenteeism_at_work_file &lt;-<span class="st"> &quot;Absenteeism_at_work.csv&quot;</span></a>
+<a class="sourceLine" id="cb66-3" title="3"></a>
+<a class="sourceLine" id="cb66-4" title="4"><span class="co"># Absenteeism</span></a>
+<a class="sourceLine" id="cb66-5" title="5">Absenteeism_data &lt;-<span class="st"> </span>Absenteeism_at_work_file <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb66-6" title="6"><span class="st">  </span>fullFilePath <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb66-7" title="7"><span class="st">  </span><span class="kw">read.csv</span>(<span class="dt">encoding =</span> <span class="st">&quot;UTF-8&quot;</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>, <span class="dt">sep =</span> <span class="st">&quot;;&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb66-8" title="8"><span class="st">  </span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb66-9" title="9">    <span class="dt">Month.of.absence =</span> <span class="kw">factor</span>(Month.of.absence, <span class="dt">labels =</span> twelve.months.and.none),</a>
+<a class="sourceLine" id="cb66-10" title="10">    <span class="dt">Reason.for.absence =</span> <span class="kw">factor</span>(Reason.for.absence, <span class="dt">labels =</span> twentyeight.reasons),</a>
+<a class="sourceLine" id="cb66-11" title="11">    <span class="dt">Seasons =</span> <span class="kw">factor</span>(Seasons, <span class="dt">labels =</span> four.seasons),</a>
+<a class="sourceLine" id="cb66-12" title="12">    <span class="st">`</span><span class="dt">Row#</span><span class="st">`</span> =<span class="st"> </span><span class="kw">row_number</span>(),</a>
+<a class="sourceLine" id="cb66-13" title="13">    <span class="dt">Absence.levels =</span> <span class="kw">cut</span>(</a>
+<a class="sourceLine" id="cb66-14" title="14">      Absenteeism.time.in.hours,</a>
+<a class="sourceLine" id="cb66-15" title="15">      <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">8</span>,<span class="dv">9</span>, <span class="kw">max</span>(Absenteeism.time.in.hours) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb66-16" title="16">      <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;Group 0&quot;</span>, <span class="st">&quot;Group 1&quot;</span>, <span class="st">&quot;Group 2&quot;</span>, <span class="st">&quot;Group 3&quot;</span>, <span class="st">&quot;Group 4&quot;</span>, <span class="st">&quot;Group 5&quot;</span>, <span class="st">&quot;Group 6&quot;</span>),</a>
+<a class="sourceLine" id="cb66-17" title="17">      <span class="dt">right =</span> <span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb66-18" title="18">    )</a>
+<a class="sourceLine" id="cb66-19" title="19">  )</a></code></pre></div>
 </div>
 </div>
 

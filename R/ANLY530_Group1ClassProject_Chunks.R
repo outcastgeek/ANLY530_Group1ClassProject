@@ -367,4 +367,27 @@ table(abs_agreement)
 
 ## @knitr naiveBayesClassification
 
+Absenteeism_data_rand <- (Absenteeism_data  %>% select(-`Row#`))[order(runif(740)),]
+Absenteeism_data_nb_train <- Absenteeism_data_rand[1:555,]
+Absenteeism_data_nb_test <- Absenteeism_data_rand[556:740,]
+
+data_nb <- naive_bayes(Absence.levels ~ ., data=Absenteeism_data_nb_train)
+summary(data_nb)
+
+
+predict_absence <- predict(data_nb, newdata= Absenteeism_data_nb_test)
+
+CrossTable(
+  Absenteeism_data_nb_test$Absence.levels,
+  predict_absence,
+  prop.chisq = FALSE,
+  prop.c = FALSE,
+  prop.r = FALSE,
+  dnn = c('Actual Absence', 'Predicted Absence')
+)
+
+
+
+
+
 
